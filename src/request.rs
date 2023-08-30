@@ -5,14 +5,15 @@
 
 //dieses File kann auch durch eine JavaScript-Datei ersetzt werden!
 
+use colored::Colorize;
+use reqwest::Error;
 use std::fs;
 use std::io;
-use reqwest::Error;
 
 const URL: &str = "https://warnung.bund.de/api31";
 
 pub fn get_gemeindeschlüssel(stadt: &str) -> Result<String, io::Error> {
-    let file = fs::read_to_string(format!("./gemeindeschluessel/{}.json", stadt))
+    let file = fs::read_to_string(format!("./gemeindeschluessel/{}", stadt))
         .expect("should have been able to read the file!");
 
     let stadt_warnung: Vec<Option<String>> =
@@ -24,24 +25,46 @@ pub fn get_gemeindeschlüssel(stadt: &str) -> Result<String, io::Error> {
         .to_owned()
         .expect("Stadt besitzt kein Gemeindeschlüssel!");
 
-    println!("Gemeindeschlüssel von {}: {}", stadt, gemeindeschlüssel);
+    println!(
+        "Gemeindeschlüssel von {}: {}",
+        stadt.purple(),
+        gemeindeschlüssel.yellow()
+    );
 
     Ok(gemeindeschlüssel)
 }
 
-//change parameter from ars to City Name !
-pub async fn get_meldungsuebersicht() -> Result<(), Error> {
+//initialize the registeredKeys from API
+pub async fn get_meldungsuebersicht_initialize(stadt: &str) -> Result<(), Error> {
     //eine Übersicht der Meldungen in deiner Region
-    let gemeindeschlüssel = get_gemeindeschlüssel("Chemnitz");
-    let body = reqwest::get(format!("{}/dashboard/{:?}.json", URL, gemeindeschlüssel))
-        .await?
-        .text()
-        .await?;
+    let gemeindeschlüssel =
+        get_gemeindeschlüssel(stadt).expect("Gemeindeschlüssel sollte erhalten sein!");
 
-    println!("{:?}", body);
+    let request_url = format!("{}/dashboard/{}.json", URL, gemeindeschlüssel);
+    println!("{}", request_url.blue());
+    let response = reqwest::get(request_url).await?;
+    let status = response.status();
+    let body = response.text().await?;
+
+    if status == 200 {
+        let gemeinde_file = fs::read_to_string(format!("./gemeindeschluessel/{}", stadt))
+            .expect("red file failed!");
+        fs::write(
+            format!("./registeredKeys/{}", stadt),
+            serde_json::to_string_pretty(&gemeinde_file)
+                .expect("deserialize should be successful!"),
+        )
+        .expect("should write file in ./registeredKeys");
+    }
+    println!("{}", status);
+    println!("{}", body);
     Ok(())
 }
 
+//change parameter from ars to City Name !
+pub async fn get_meldungsuebersicht() {
+    todo!()
+}
 pub fn get_warnungen_details(id: String) {
     //detailinformation  zu einer Warnung!
     todo!()

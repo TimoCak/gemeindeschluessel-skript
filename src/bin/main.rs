@@ -6,7 +6,7 @@ use gemeindeschluessel_skript::model::BundResponse;
 fn main() {
     let timestamp = Instant::now();
     println!("{}", "startet...".green());
-    fs::create_dir_all("./gemeindeschluessel").expect("deser/ser failed! ");
+    fs::create_dir_all("./gemeindeschluessel").expect("create dir should be successful");
     deserialize_and_serialize();
 
     println!(
