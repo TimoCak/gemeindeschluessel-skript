@@ -1,13 +1,14 @@
-use std::{fs, time::Instant};
 use colored::Colorize;
+use std::{fs, time::Instant};
 
 use gemeindeschluessel_skript::model::BundResponse;
 
 fn main() {
     let timestamp = Instant::now();
-    println!("{}","startet....".green());
-    fs::create_dir_all("./output").expect("deser/ser failed! ");
+    println!("{}", "startet...".green());
+    fs::create_dir_all("./gemeindeschluessel").expect("deser/ser failed! ");
     deserialize_and_serialize();
+
     println!(
         "Skript hat {}s gebraucht.",
         timestamp.elapsed().as_secs_f32().to_string().green()
@@ -36,6 +37,6 @@ fn deserialize_and_serialize() {
         }
         println!("Datei für {} gespeichert!", newName.purple().bold());
 
-        fs::write(format!("./output/{}.json", newName), gemeinde_json).expect("write file failed!");
+        fs::write(format!("./gemeindeschluessel/{}.json", newName), gemeinde_json).expect("write file failed!");
     }
 }
