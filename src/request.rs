@@ -62,8 +62,18 @@ pub async fn get_meldungsuebersicht_initialize(stadt: &str) -> Result<(), Error>
 }
 
 //change parameter from ars to City Name !
-pub async fn get_meldungsuebersicht() {
-    todo!()
+pub async fn get_meldungsuebersicht(stadt: &str) -> Result<String, Error> {
+    let gemeindeschlüssel =
+        get_gemeindeschlüssel(stadt).expect("Gemeindeschlüssel sollte erhalten sein!");
+
+    let request_url = format!("{}/dashboard/{}.json", URL, gemeindeschlüssel);
+    println!("{}", request_url.blue());
+    let response = reqwest::get(request_url).await?;
+    let status = response.status();
+    let body = response.text().await?;
+    println!("{}", status);
+    println!("{}", body);
+    Ok(body)
 }
 pub fn get_warnungen_details(id: String) {
     //detailinformation  zu einer Warnung!
