@@ -47,8 +47,11 @@ pub async fn get_meldungsuebersicht_initialize(stadt: &str) -> Result<(), Error>
     let body = response.text().await?;
 
     if status == 200 {
-        let gemeinde_file = fs::read_to_string(format!("./gemeindeschluessel/{}", stadt))
-            .expect("red file failed!");
+        let gemeinde_file: Vec<Option<String>> = serde_json::from_str(&fs::read_to_string(format!(
+            "./gemeindeschluessel/{}",
+            stadt
+        ))
+        .expect("red file failed!")).unwrap();
         fs::write(
             format!("./registeredKeys/{}", stadt),
             serde_json::to_string_pretty(&gemeinde_file)

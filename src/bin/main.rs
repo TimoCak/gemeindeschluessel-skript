@@ -23,8 +23,9 @@ fn read_gemeindeschluesel() -> String {
 
 fn deserialize_and_serialize() {
     let deserialze_data: BundResponse = serde_json::from_str(&read_gemeindeschluesel()).unwrap();
-
-    for item in deserialze_data.daten {
+    for mut item in deserialze_data.daten {
+        item[0] = Some(set_last_seven_to_zero(item.get(0) .unwrap().to_owned().unwrap()));
+        println!("{:?}", item[0]);
         let gemeinde_json = serde_json::to_string_pretty(&item).expect("serialize failed!");
         let mut dataname = item.get(1).unwrap().to_owned().unwrap();
         let mut newName = String::from("");
@@ -39,4 +40,19 @@ fn deserialize_and_serialize() {
 
         fs::write(format!("./gemeindeschluessel/{}.json", newName), gemeinde_json).expect("write file failed!");
     }
+}
+
+fn set_last_seven_to_zero(g_id: String) -> String {
+    let mut counter = 0;
+    let mut string_result = String::from("");
+    for s in g_id.chars() {
+        if  counter>4 {
+           string_result.push('0');
+        } else {
+            string_result.push(s);
+        }
+        counter = counter + 1;
+    }
+    println!("RESULT: {}", string_result);
+    string_result
 }
