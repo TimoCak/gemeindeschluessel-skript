@@ -27,10 +27,11 @@ async fn main() -> Result<(), Error> {
         let boeb_body = get_meldungsuebersicht("Böblingen.json").await?;
         let nag_body = get_meldungsuebersicht("Nagold.json").await?;
         let stutt_body = get_meldungsuebersicht("Stuttgart.json").await?;
-
+        /*
+        * remove comments to play sound from the sounds directory
         if boeb_body.ne("[]") || nag_body.ne("[]") || stutt_body.ne("[]") {
             play_sound("sound2.mp3");
-        }
+        }*/
         println!(
             "{}.Durchlauf: {}s.",
             counter,
